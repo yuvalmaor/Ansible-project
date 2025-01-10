@@ -1,0 +1,7 @@
+all:
+  hosts:
+    wordpress-server:
+      ansible_host: 192.168.1.30
+      ansible_user: yuval
+      ansible_ssh_private_key_file: /home/yuval/.ssh/id_rsa
+

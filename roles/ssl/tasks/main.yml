@@ -1,0 +1,49 @@
+---
+# SSL Role for Cloudflare
+
+- name: Update system packages
+  dnf:
+    name: "*"
+    state: latest
+
+- name: Install EPEL repository
+  dnf:
+    name: epel-release
+    state: present
+
+- name: Install Certbot and Cloudflare DNS plugin
+  dnf:
+    name:
+      - certbot
+      - python3-certbot-dns-cloudflare
+    state: present
+
+- name: Create Cloudflare credentials directory
+  file:
+    path: /etc/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create Cloudflare credentials file
+  copy:
+    dest: "{{ cloudflare_ini }}"
+    content: "dns_cloudflare_api_token = {{ cloudflare_api_token }}"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Generate SSL certificate for WordPress site
+  command: >
+    certbot certonly
+    --dns-cloudflare
+    --dns-cloudflare-credentials {{ cloudflare_ini }}
+    --email {{ email }}
+    --agree-tos
+    --non-interactive
+    -d wordpress4.yuvallab.xyz
+    --dns-cloudflare-propagation-seconds 60
+
+- name: Verify issued certificates
+  command: certbot certificates

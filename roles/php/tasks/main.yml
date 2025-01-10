@@ -1,0 +1,48 @@
+---
+# roles/php_install/tasks/main.yml
+
+- name: Install EPEL repository
+  dnf:
+    name: epel-release
+    state: present
+
+- name: Remove PHP module
+  ansible.builtin.dnf:
+    name: php
+    state: absent
+    update_cache: yes
+
+- name: Install Remi repository1
+  command: >
+    sudo dnf install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm
+
+# - name: Install Remi repository
+#   ansible.builtin.dnf:
+#     name: https://rpms.remirepo.net/enterprise/remi-release-9.rpm
+#     state: present
+#     update_cache: yes
+#     gpgcheck: no
+
+- name: Enable Remi PHP 8.3 module
+  command: dnf module enable php:remi-8.3 -y
+  
+- name: Install PHP 8.3, PHP-FPM, and necessary extensions
+  dnf:
+    name:
+      - php
+      - php-cli
+      - php-fpm
+      - php-mysqlnd
+      - php-curl
+      - php-xml
+      - php-mbstring
+      - php-zip
+    state: present
+
+- name: Check PHP version
+  command: php -v
+  register: php_version
+
+- name: Display PHP version
+  debug:
+    msg: "PHP version: {{ php_version.stdout }}"

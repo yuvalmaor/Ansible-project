@@ -1,0 +1,21 @@
+- name: Ensure the wordpress.conf is updated
+  template:
+    src: wordpress.conf.j2
+    dest: /etc/nginx/conf.d/wordpress.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+
+- name: Debug site_url variable
+  debug:
+    var: site_url
+  become: true
+
+# Handlers to restart nginx
+- name: Restart Nginx service
+  service:
+    name: nginx
+    state: restarted
+  become: yes

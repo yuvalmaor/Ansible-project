@@ -1,0 +1,30 @@
+---
+- name: Deploy WordPress on remote server
+  hosts: wordpress-server
+  become: true
+  vars_files:
+    - /home/yuval/projects/task14/vault.yml  # Load the vault file here
+#- /home/yuval/projects/task14/wordpress-setup/roles/sslwordpress/vars/vault.yml
+#  vars:
+ #   mysql_host: "localhost"
+ #   php_version: "7.4"
+#    cloudflare_ini: "/etc/letsencrypt/cloudflare.ini"
+#    cloudflare_api_token: "9pojT3ndKyvIS6-dBNIsBQtMoArWM0GSeF8ItsZE"
+    # email: "yuvalnix305@gmail.com"
+    # mysql_root_password: "My$tr0ngP@ssw0rd!"
+    # db_name: "wordpress"
+    # db_user: "wordpress"
+    # db_password: "My$tr0ngP@ssw0rd!"
+    # db_host: "localhost"
+
+  roles:
+    - ssl
+    - nginx
+    - firewall
+    - php
+    - wordpress
+    - mysql
+    - configwordpress
+    - sslwordpress
+
+

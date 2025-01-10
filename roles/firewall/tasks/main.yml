@@ -1,0 +1,19 @@
+---
+# tasks/main.yml
+
+# - name: Disable SELinux enforcement
+#   ansible.builtin.command:
+#     cmd: setenforce 0
+#   become: true
+- name: Disable SELinux enforcement
+  ansible.builtin.selinux:
+    state: disabled
+  become: true
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Stop firewalld service
+  ansible.builtin.systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+  become: true

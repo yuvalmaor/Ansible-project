@@ -1,0 +1,53 @@
+<?php
+define( 'DB_NAME', '{{ db_name }}' );
+
+define( 'DB_USER', '{{ db_user }}' );
+
+define( 'DB_PASSWORD', '{{ db_password }}' );
+
+define( 'DB_HOST', '{{ db_host }}' );
+
+
+define('AUTH_KEY',         '0XO7t)|lGF=VHd-MHd-OF`|<aYD;b*q{E1m]Mb}l];`faWLJ8c=I).@Ue=|Cx^V&');
+define('SECURE_AUTH_KEY',  '{!_6~wcL-v; +|l+;JlfzJ1_?^~:~%2A?!K?/vVt0IcTZB~2u+Ic+/L{}20$~Dpz');
+define('LOGGED_IN_KEY',    '6BY}5wn:PDd_]Tju1fJW+wvnxvr(&(=f{| 6v,*]j-|dmzY1ie<%UphnXRCSrgee');
+define('NONCE_KEY',        ':-c>S{7@|l7)zq(}(@045AWlfk.FS&W_xPTMsl}Y%QPoV]k;*H=c$gbRTM/=xw|L');
+define('AUTH_SALT',        'hV+hS71X4w.]gK7r+_Z-2&|F:S2&fzybBx?Ag)9:5:Ne?$[5+VuGpVc: {fj$>VD');
+define('SECURE_AUTH_SALT', 'QQqaZ[T1Xpp7-?xe|xmc4PP$^=wp9S]hNUWPiF_%!@IJ+v-J|V|yC}+l9:JRK599');
+define('LOGGED_IN_SALT',   'en<:VK2!IY_X2$qy+k_W-%H^V1uaLz}FrV(e!v^bUiP6x{AT<HuAH5bcQe%r@>N4');
+define('NONCE_SALT',       '^y,8W1xX6Ew%hJWc;&$T:3=YOhsp/y;RG%:*FDgmL?~Qj{d!PP^RLcy0hw|F) .:');
+
+/** WordPress Database Table prefix. */
+$table_prefix = 'wp_';
+
+/** Debugging mode. */
+define( 'WP_DEBUG', false );
+
+// Enable automatic WordPress installation if the configuration is valid
+if ( ! defined( 'ABSPATH' ) )
+	define( 'ABSPATH', dirname( __FILE__ ) . '/' );
+
+// Enable automatic installation
+if ( ! file_exists( ABSPATH . 'wp-settings.php' ) ) {
+    $install_file = ABSPATH . 'wp-admin/install.php';
+    if ( file_exists( $install_file ) ) {
+        require_once( $install_file );
+        exit;
+    }
+}
+
+require_once( ABSPATH . 'wp-settings.php' );
+// Additional WordPress settings can be added here
+
+/** Site Title */
+define( 'WP_INSTALLING', true );
+define( 'WP_SITEURL', 'http://wordpress4.yuvallab.xyz/' );  // Replace with your actual site URL
+define( 'WP_HOME', 'http://wordpress4.yuvallab.xyz/' );     // Replace with your actual site URL
+define( 'WP_DEBUG', false );
+/** Admin User Configuration */
+define( 'WP_ADMIN_USER', 'yuval' );
+define( 'WP_ADMIN_PASSWORD', '{{ db_password }}' );
+define( 'WP_ADMIN_EMAIL', 'yuvalnix305@gmail.com' );
+define( 'WP_AUTO_INSTALL', true );
+define( 'WP_MEMORY_LIMIT', '64M' );
+?>

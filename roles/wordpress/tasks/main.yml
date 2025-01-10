@@ -1,0 +1,102 @@
+---
+# Ensure the required PHP extensions are installed on CentOS Stream 9
+- name: Ensure the required PHP extensions are installed on CentOS Stream 9
+  dnf:
+    name:
+      - php-mysqlnd
+      - php-curl
+      - php-xml
+      - php-mbstring
+      - php-zip
+    state: present
+    update_cache: yes
+  become: yes
+
+# Create the WordPress directory
+- name: Create the WordPress directory
+  file:
+    path: /var/www/wordpress
+    state: directory
+    owner: nginx
+    group: nginx
+    mode: '0755'
+  become: yes
+
+# Download the latest WordPress package
+- name: Download the latest WordPress package
+  get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: /tmp/latest.tar.gz
+  become: yes
+
+# Extract WordPress package
+- name: Extract WordPress package
+  unarchive:
+    src: /tmp/latest.tar.gz
+    dest: /var/www/wordpress
+    remote_src: yes
+    creates: /var/www/wordpress/wordpress
+  become: yes
+
+# Set the correct ownership for WordPress files
+- name: Set the correct ownership for WordPress files
+  file:
+    path: /var/www/wordpress/wordpress
+    recurse: yes
+    owner: nginx
+    group: nginx
+    mode: '0755'
+  become: yes
+
+# Configure Nginx for WordPress
+- name: Configure Nginx for WordPress
+  copy:
+    content: |
+      server {
+          listen 80;
+          server_name _;
+
+          root /var/www/wordpress/wordpress;
+          index index.php index.html index.htm;
+
+          location / {
+              try_files $uri $uri/ /index.php?$args;
+          }
+
+          location ~ \.php$ {
+              fastcgi_pass unix:/run/php-fpm/www.sock;
+              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+              include fastcgi_params;
+          }
+
+          location ~ /\.ht {
+              deny all;
+          }
+      }
+    dest: /etc/nginx/conf.d/wordpress.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+
+# Create a symlink for Nginx site configuration
+- name: Create a symlink for Nginx site configuration
+  command: ln -s /etc/nginx/sites-available/wordpress /etc/nginx/sites-enabled/wordpress
+  args:
+    removes: /etc/nginx/sites-enabled/wordpress
+  become: yes
+
+# Test Nginx configuration
+- name: Test Nginx configuration
+  command: nginx -t
+  become: yes
+
+# Restart Nginx service
+- name: Restart Nginx service
+  service:
+    name: nginx
+    state: restarted
+  become: yes
+
+
+#**********************

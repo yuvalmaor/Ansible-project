@@ -1,0 +1,83 @@
+- name: Install MySQL 8.x from DNF repositories
+  dnf:
+    name: mysql-server
+    state: present
+  become: yes
+
+- name: Start MySQL service
+  service:
+    name: mysqld
+    state: started
+    enabled: yes
+  become: yes
+
+
+
+- name: Run mysql_secure_installation non-interactively
+  expect:
+    command: /usr/bin/mysql_secure_installation
+    responses:
+      'Press y|Y for Yes, any other key for No: ': 'y'
+      'Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG:': '2'
+      'Please set the password for root here.': '{{ MYSQL_ROOT_PASSWORD }}'  # Set the root password here
+      'Re-enter new password:': '{{ MYSQL_ROOT_PASSWORD }}'  # Re-enter root password
+      'Do you wish to continue with the password provided?': 'y'
+      'Remove anonymous users?': 'n'
+      'Disallow root login remotely?': 'n'
+      'Remove test database and access to it?': 'n'
+      'Reload privilege tables now?': 'n'
+    timeout: 10
+  become: yes
+  environment:
+    MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
+  ignore_errors: yes
+
+#**************
+- name: Install pip for Python 3
+  become: yes
+  package:
+    name: python3-pip
+    state: present
+
+- name: Install PyMySQL using pip
+  become: yes
+  pip:
+    name: PyMySQL
+    state: present
+
+- name: Create wordpress database
+  mysql_db:
+    name: wordpress
+    state: present
+    login_user: root
+    login_password: "{{ MYSQL_ROOT_PASSWORD }}"
+  become: yes
+  environment:
+    MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}!"
+
+
+- name: Create wordpress user
+  mysql_user:
+    name: wordpress
+    password: "{{ MYSQL_ROOT_PASSWORD }}"
+    host: "%"
+    state: present
+    login_user: root
+    login_password: "{{ MYSQL_ROOT_PASSWORD }}"
+  become: yes
+
+- name: Grant permissions to wordpress user
+  mysql_user:
+    name: wordpress
+    priv: "wordpress.*:ALL"
+    host: "%"
+    state: present
+    login_user: root
+    login_password: "{{ MYSQL_ROOT_PASSWORD }}"
+  become: yes
+
+- name: Flush privileges
+  command: mysql -u root -e "FLUSH PRIVILEGES;"
+  become: yes
+  environment:
+    MYSQL_PWD: "{{ MYSQL_ROOT_PASSWORD }}"
